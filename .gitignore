@@ -8,3 +8,6 @@ obj/
 TestResults/
 *.log
 Settings.json
+make_preview.py
+chk*.png
+f*.png

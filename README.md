@@ -1,6 +1,8 @@
-# Vexqlyn
+# Glimule
 
 Индикатор Caps Lock и раскладки у текстового курсора в Windows — капсула в стиле macOS, прямо в поле ввода.
+
+![Glimule](preview.gif)
 
 ## Что делает
 
