@@ -1,24 +1,33 @@
 # Glimule
 
-Индикатор Caps Lock и раскладки у текстового курсора в Windows — капсула в стиле macOS, прямо в поле ввода.
+A tiny Windows tray HUD that shows **Caps Lock** and the **keyboard layout** next to the text caret.
 
 ![Glimule](preview.gif)
 
-## Что делает
+When you type, a capsule appears at the insertion point: an outlined Caps Lock glyph while Caps is on, and a sliding **A | РУ** (or your other layouts) picker when you switch languages. The indicator follows the focused text field and stays out of the way otherwise.
 
-- Показывает Caps Lock и переключение языка (A / РУ) у каретки
-- Прячет системный переключатель раскладки Windows в текстовых полях
-- Работает в обычных полях ввода, браузерах, Word и Excel
-- Не появляется в деревьях, списках и панелях вроде NVIDIA Control Panel
-- Масштаб капсулы меняется на лету, без перезапуска
+Works in ordinary edit boxes, browsers, Word, and Excel. Built with WPF on .NET 8.
 
-## Запуск
+## Features
 
-Нужны Windows 10/11 и [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0).
+- Capsule overlay anchored to the caret, not the screen corner
+- Caps Lock shown only when you stop typing
+- Language-switch animation with a sliding selection pill
+- Optional hide of the stock Windows language overlay while a text field is focused
+- Live scale (50–200%) from the tray, no restart
+- Run at startup, from the tray menu
+
+## Run
+
+Requires Windows 10/11 and [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0).
 
 ```powershell
 dotnet build -c Release
 Start-Process .\bin\Release\net8.0-windows\CursorUI.exe
 ```
 
-Или скопируйте сборку в `%LOCALAPPDATA%\CursorUI` и запускайте оттуда. В трее: **Настройки** и **Выход**.
+Quit from the tray icon (**Выход**). Settings are under **Настройки**.
+
+## По-русски
+
+Утилита в трее: капсула у текстового курсора показывает Caps Lock и текущую раскладку (A / РУ и другие). Появляется только в полях ввода. Выход и настройки — в меню иконки в трее.
