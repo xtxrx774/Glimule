@@ -1,12 +1,12 @@
 # Glimule
 
-## Keyboard layout and Caps Lock indicator for Windows
+## macOS-style keyboard layout and Caps Lock HUD for Windows
 
 ![Glimule](preview.gif)
 
-Glimule is a lightweight tray utility that displays the active keyboard layout and Caps Lock state beside the text caret. It provides a compact visual cue while you work in text fields without replacing the standard Windows input controls.
+On macOS Sonoma and Tahoe, switching the keyboard layout or Caps Lock shows a small capsule next to the text caret. Glimule brings that same mechanic to Windows.
 
-The indicator follows the focused caret and adapts to the current monitor, making the active layout visible where it matters: next to the text you are editing.
+The capsule appears only in real text fields, follows the caret across monitors, and does not replace the system caret or Windows input controls. Layouts are labeled the macOS way: English as **A**, Russian as **РУ**, and other languages in native script or ISO code. The app runs from the tray; settings stay in English regardless of the system language.
 
 ## Features
 
