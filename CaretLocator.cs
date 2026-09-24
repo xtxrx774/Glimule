@@ -52,13 +52,16 @@ internal static class CaretLocator
         var threadId = Native.GetWindowThreadProcessId(focus, out _);
         var cls = Native.ClassName(focus);
         var attachedFocus = IntPtr.Zero;
-        if (!IsTextInputTarget(focus) && !IsTextInputTarget(info.hwndCaret))
+        if (!IsTextInputTarget(focus) && !IsTextInputTarget(info.hwndCaret) && !IsDedicatedEditor(focus, info))
         {
             _cached = default;
             return default;
         }
 
+        var editor = ResolveEditorHwnd(focus, info.hwndCaret);
         if (TryGuiCaret(info, threadId, out var caret)) return Remember(caret);
+        if (TryScintillaCaret(editor, threadId, out caret)) return Remember(caret);
+        if (TryEditPosCaret(editor, threadId, out caret)) return Remember(caret);
         if (TryAttachedCaret(focus, threadId, out caret, out attachedFocus)) return Remember(caret);
         if (TryAccCaret(info.hwndCaret, focus, attachedFocus, threadId, out caret)) return Remember(caret);
         if (TryImeCaret(focus, info.hwndCaret, threadId, out caret)) return Remember(caret);
@@ -72,11 +75,13 @@ internal static class CaretLocator
 
         var textFocus = info.hwndCaret != IntPtr.Zero
                         || (info.flags & Native.GuiCaretBlinking) != 0
-                        || IsEditClass(cls);
+                        || IsEditClass(cls)
+                        || IsDedicatedEditorClass(cls)
+                        || IsTextInputTarget(focus);
 
         if (textFocus)
         {
-            var probe = WithField(new CaretInfo(0, 0, 0, 0, false, true, focus, threadId, IntPtr.Zero, default), focus);
+            var probe = WithField(new CaretInfo(0, 0, 0, 0, false, true, editor != IntPtr.Zero ? editor : focus, threadId, IntPtr.Zero, default), editor != IntPtr.Zero ? editor : focus);
             if (TryFallbackInField(probe, out caret)) return Remember(caret);
             return probe;
         }
@@ -128,7 +133,13 @@ internal static class CaretLocator
             var origin = attachedFocus != IntPtr.Zero ? attachedFocus : focus;
             if (origin == IntPtr.Zero) return false;
             if (!Native.GetCaretPos(out var pos)) return false;
-            if (Math.Abs(pos.X) < 2 && Math.Abs(pos.Y) < 2 && IsRootSized(origin)) return false;
+            var originClass = Native.ClassName(origin);
+            var likelyFakeOrigin =
+                Math.Abs(pos.X) < 2 && Math.Abs(pos.Y) < 2
+                && IsRootSized(origin)
+                && !IsEditClass(originClass)
+                && !IsDedicatedEditorClass(originClass);
+            if (likelyFakeOrigin) return false;
             if (!Native.ClientToScreen(origin, ref pos)) return false;
             var rect = new Native.Rect { Left = pos.X, Top = pos.Y, Right = pos.X + 2, Bottom = pos.Y + 16 };
             if (!IsRealCaret(rect, origin)) return false;
@@ -226,20 +237,22 @@ internal static class CaretLocator
             if (focused == null) return false;
             if (focused.Current.ProcessId == Environment.ProcessId) return false;
 
+            var text = FindTextElement(focused);
             if (Native.ClassName(focus).Contains("HwndWrapper", StringComparison.OrdinalIgnoreCase)
                 && TryWpfCaret(focused, focus, threadId, out caret))
             {
                 return true;
             }
-            if (TryTextCaret(focused, focus, threadId, out caret))
+            if (text != null && TryTextCaret(text, focus, threadId, out caret))
             {
-                caret = WithUiaField(caret, focused);
+                caret = WithUiaField(caret, text);
                 if (caret.Ok) return true;
-                if (TryUiaBounds(focused, focus, threadId, out caret)) return true;
+                if (TryUiaBounds(text, focus, threadId, out caret)) return true;
                 return TryFallbackInField(caret, out caret);
             }
 
             if (IsTextControl(focused) && TryUiaBounds(focused, focus, threadId, out caret)) return true;
+            if (text != null && text != focused && TryUiaBounds(text, focus, threadId, out caret)) return true;
         }
         catch
         {
@@ -576,12 +589,20 @@ internal static class CaretLocator
         return w >= rw * 0.65 && h >= rh * 0.45;
     }
 
+    private static bool IsDedicatedEditor(IntPtr focus, Native.GuiThreadInfo info)
+    {
+        if (IsDedicatedEditorClass(Native.ClassName(focus))) return true;
+        if (info.hwndCaret != IntPtr.Zero && IsDedicatedEditorClass(Native.ClassName(info.hwndCaret)))
+            return true;
+        return false;
+    }
+
     private static bool IsTextInputTarget(IntPtr hwnd)
     {
         if (hwnd == IntPtr.Zero) return false;
         var cls = Native.ClassName(hwnd);
         if (IsNonTextClass(cls)) return false;
-        if (IsEditClass(cls) || IsBrowserClass(cls)) return true;
+        if (IsEditClass(cls) || IsDedicatedEditorClass(cls)) return true;
         if (cls.Contains("ComboBox", StringComparison.OrdinalIgnoreCase))
         {
             return (Native.GetStyle(hwnd) & Native.CbsDropDownList) != Native.CbsDropDownList;
@@ -625,13 +646,30 @@ internal static class CaretLocator
         return false;
     }
 
+    private static bool IsDedicatedEditorClass(string cls)
+    {
+        if (string.IsNullOrEmpty(cls)) return false;
+        if (cls.Equals("PX_WINDOW_CLASS", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("AkelEdit", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("SynEdit", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("EmEditor", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("VsText", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("DesktopChildSiteBridge", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("DesktopWindowContentBridge", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("InputSite.WindowClass", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("QPlainTextEdit", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("QTextEdit", StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
+
     private static bool IsEditClass(string cls)
     {
         if (string.IsNullOrEmpty(cls)) return false;
         if (cls.Equals("Edit", StringComparison.OrdinalIgnoreCase)) return true;
         if (cls.StartsWith("RichEdit", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("RICHEDIT", StringComparison.OrdinalIgnoreCase)) return true;
         if (cls.StartsWith("WindowsForms10.EDIT", StringComparison.OrdinalIgnoreCase)) return true;
-        if (cls.StartsWith("Scintilla", StringComparison.OrdinalIgnoreCase)) return true;
+        if (cls.Contains("Scintilla", StringComparison.OrdinalIgnoreCase)) return true;
         if (cls.Contains("TextBox", StringComparison.OrdinalIgnoreCase)) return true;
         if (cls.Contains("TMemo", StringComparison.OrdinalIgnoreCase) || cls.Equals("TEdit", StringComparison.OrdinalIgnoreCase)) return true;
         if (cls.Equals("Internet Explorer_Server", StringComparison.OrdinalIgnoreCase)) return true;
@@ -648,7 +686,7 @@ internal static class CaretLocator
             if (el == null) return false;
             if (el.Current.ProcessId == Environment.ProcessId) return false;
 
-            for (var i = 0; i < 6 && el != null; i++)
+            for (var i = 0; i < 8 && el != null; i++)
             {
                 ControlType type;
                 try { type = el.Current.ControlType; }
@@ -666,6 +704,154 @@ internal static class CaretLocator
         }
 
         return false;
+    }
+
+    private static bool HasTextPattern(AutomationElement element)
+    {
+        try
+        {
+            var value = element.GetCurrentPropertyValue(AutomationElement.IsTextPatternAvailableProperty);
+            if (value is true) return true;
+        }
+        catch
+        {
+            // some providers reject the property
+        }
+
+        try
+        {
+            return element.TryGetCurrentPattern(TextPattern.Pattern, out _);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static AutomationElement? FindTextElement(AutomationElement focused)
+    {
+        try
+        {
+            for (var el = focused; el != null;)
+            {
+                if (HasTextPattern(el) || IsTextControl(el)) return el;
+                ControlType type;
+                try { type = el.Current.ControlType; }
+                catch { break; }
+                if (IsNonTextControl(type)) break;
+                el = TreeWalker.ControlViewWalker.GetParent(el);
+            }
+        }
+        catch
+        {
+            return focused;
+        }
+
+        return HasTextPattern(focused) || IsTextControl(focused) ? focused : null;
+    }
+
+    private static IntPtr ResolveEditorHwnd(IntPtr focus, IntPtr hwndCaret)
+    {
+        foreach (var candidate in new[] { hwndCaret, focus })
+        {
+            if (candidate == IntPtr.Zero) continue;
+            var cls = Native.ClassName(candidate);
+            if (IsEditClass(cls) || IsDedicatedEditorClass(cls)) return candidate;
+        }
+
+        if (focus != IntPtr.Zero)
+        {
+            var scintilla = FindChildByClass(focus, "Scintilla");
+            if (scintilla != IntPtr.Zero) return scintilla;
+        }
+
+        return focus;
+    }
+
+    private static IntPtr FindChildByClass(IntPtr parent, string classPrefix)
+    {
+        var found = IntPtr.Zero;
+        Native.EnumChildWindows(parent, (hwnd, _) =>
+        {
+            if (!Native.IsWindowVisible(hwnd)) return true;
+            if (Native.ClassName(hwnd).Contains(classPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                found = hwnd;
+                return false;
+            }
+
+            return true;
+        }, IntPtr.Zero);
+        return found;
+    }
+
+    private const int SciGetCurrentPos = 2008;
+    private const int SciPointXFromPosition = 2164;
+    private const int SciPointYFromPosition = 2165;
+    private const int SciTextHeight = 2279;
+    private const int SciLineFromPosition = 2166;
+    private const int EmGetSel = 0x00B0;
+    private const int EmPosFromChar = 0x00D6;
+
+    private static bool TryScintillaCaret(IntPtr hwnd, uint threadId, out CaretInfo caret)
+    {
+        caret = default;
+        if (hwnd == IntPtr.Zero) return false;
+        if (!Native.ClassName(hwnd).Contains("Scintilla", StringComparison.OrdinalIgnoreCase)) return false;
+
+        var pos = Native.SendMessage(hwnd, SciGetCurrentPos, IntPtr.Zero, IntPtr.Zero).ToInt32();
+        if (pos < 0) return false;
+        var x = Native.SendMessage(hwnd, SciPointXFromPosition, IntPtr.Zero, (IntPtr)pos).ToInt32();
+        var y = Native.SendMessage(hwnd, SciPointYFromPosition, IntPtr.Zero, (IntPtr)pos).ToInt32();
+        var line = Native.SendMessage(hwnd, SciLineFromPosition, (IntPtr)pos, IntPtr.Zero).ToInt32();
+        var height = Native.SendMessage(hwnd, SciTextHeight, (IntPtr)line, IntPtr.Zero).ToInt32();
+        if (height is < 8 or > 96) height = 16;
+        if (!IsPointInClient(hwnd, x, y)) return false;
+
+        var pt = new Native.Point { X = x, Y = y };
+        if (!Native.ClientToScreen(hwnd, ref pt)) return false;
+        var rect = new Native.Rect { Left = pt.X, Top = pt.Y, Right = pt.X + 2, Bottom = pt.Y + height };
+        if (!IsPlausibleScreen(rect)) return false;
+        caret = ToInfo(rect, hwnd, threadId);
+        return true;
+    }
+
+    private static bool TryEditPosCaret(IntPtr hwnd, uint threadId, out CaretInfo caret)
+    {
+        caret = default;
+        if (hwnd == IntPtr.Zero) return false;
+        var cls = Native.ClassName(hwnd);
+        if (!cls.Equals("Edit", StringComparison.OrdinalIgnoreCase)
+            && !cls.StartsWith("WindowsForms10.EDIT", StringComparison.OrdinalIgnoreCase)
+            && !cls.Equals("TEdit", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var packedSel = Native.SendMessage(hwnd, EmGetSel, IntPtr.Zero, IntPtr.Zero).ToInt32();
+        var start = packedSel & 0xFFFF;
+        var packed = Native.SendMessage(hwnd, EmPosFromChar, (IntPtr)start, IntPtr.Zero).ToInt32();
+        if (packed == -1) return false;
+        var x = packed & 0xFFFF;
+        var y = (packed >> 16) & 0xFFFF;
+        if (x > 8000 || y > 8000) return false;
+        if (!IsPointInClient(hwnd, x, y)) return false;
+
+        var pt = new Native.Point { X = x, Y = y };
+        if (!Native.ClientToScreen(hwnd, ref pt)) return false;
+        if (!Native.GetClientRect(hwnd, out var client)) return false;
+        var height = Math.Clamp(client.Bottom - client.Top, 12, 28);
+        if (client.Bottom - client.Top > 40) height = 16;
+        var rect = new Native.Rect { Left = pt.X, Top = pt.Y, Right = pt.X + 2, Bottom = pt.Y + height };
+        if (!IsPlausibleScreen(rect)) return false;
+        caret = ToInfo(rect, hwnd, threadId);
+        return true;
+    }
+
+    private static bool IsPointInClient(IntPtr hwnd, int x, int y)
+    {
+        if (!Native.GetClientRect(hwnd, out var client)) return true;
+        return x >= -8 && y >= -8 && x <= client.Right + 8 && y <= client.Bottom + 8;
     }
 
     private static bool UiaComboEditable(AutomationElement element)
@@ -729,6 +915,7 @@ internal static class CaretLocator
         {
             var type = element.Current.ControlType;
             if (type == ControlType.Edit || type == ControlType.Document) return true;
+            if (HasTextPattern(element)) return true;
             if (type == ControlType.ComboBox) return UiaComboEditable(element);
             return false;
         }
