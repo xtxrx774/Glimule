@@ -12,7 +12,7 @@ internal sealed class TrayService : IDisposable
         _icon = new NotifyIcon
         {
             Visible = false,
-            Text = "CursorUI",
+            Text = "Glimule",
             Icon = LoadIcon()
         };
 
@@ -33,6 +33,24 @@ internal sealed class TrayService : IDisposable
 
     private static Icon LoadIcon()
     {
+        try
+        {
+            var resource = System.Windows.Application.GetResourceStream(
+                new Uri("pack://application:,,,/Assets/Glimule.ico"));
+            if (resource?.Stream != null)
+            {
+                using (resource.Stream)
+                using (var loaded = new Icon(resource.Stream))
+                {
+                    return new Icon(loaded, SystemInformation.SmallIconSize);
+                }
+            }
+        }
+        catch
+        {
+            // fall back
+        }
+
         var exe = Environment.ProcessPath;
         if (!string.IsNullOrWhiteSpace(exe))
         {

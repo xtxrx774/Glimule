@@ -7,9 +7,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyName>CursorUI</AssemblyName>
+    <ApplicationIcon>Assets\Glimule.ico</ApplicationIcon>
+    <AssemblyName>Glimule</AssemblyName>
     <RootNamespace>CursorUI</RootNamespace>
+    <Product>Glimule</Product>
+    <AssemblyTitle>Glimule</AssemblyTitle>
+    <Description>Keyboard layout and Caps Lock indicator for Windows</Description>
   </PropertyGroup>
+    <ItemGroup>
+    <Resource Include="Assets\Glimule.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Using Remove="System.Drawing" />
     <Using Remove="System.Windows.Forms" />

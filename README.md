@@ -21,7 +21,7 @@ The indicator follows the focused caret and adapts to the current monitor, makin
 
 ## Installation
 
-Download the latest build from [Releases](https://github.com/xtxrx774/Glimule/releases), extract it, and run `CursorUI.exe`.
+Download the latest build from [Releases](https://github.com/xtxrx774/Glimule/releases), extract it, and run `Glimule.exe`.
 
 Glimule requires Windows 10 or later and [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
 
@@ -33,11 +33,11 @@ The project uses WPF and WinForms on .NET 8:
 dotnet build -c Release
 ```
 
-The executable is written to `bin\Release\net8.0-windows\CursorUI.exe`.
+The executable is written to `bin\Release\net8.0-windows\Glimule.exe`.
 
 ## Usage
 
-Launch `CursorUI.exe`. The application runs in the notification area. Open the tray menu to change the scale, configure startup, open settings, or exit.
+Launch `Glimule.exe`. The application runs in the notification area. Open the tray menu to change the scale, configure startup, open settings, or exit.
 
 ## По-русски
 

@@ -13,7 +13,7 @@ internal sealed class KeyboardHook : IDisposable
     public KeyboardHook()
     {
         _proc = OnKey;
-        var module = System.IO.Path.GetFileName(Environment.ProcessPath ?? "CursorUI.exe");
+        var module = System.IO.Path.GetFileName(Environment.ProcessPath ?? "Glimule.exe");
         _hook = Native.SetWindowsHookEx(Native.WhKeyboardLl, _proc, Native.GetModuleHandle(module), 0);
     }
 

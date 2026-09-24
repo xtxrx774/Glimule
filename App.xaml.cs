@@ -6,7 +6,7 @@ namespace CursorUI;
 
 public partial class App : System.Windows.Application
 {
-    private const string MutexName = @"Local\CursorUI.SingleInstance";
+    private const string MutexName = @"Local\Glimule.SingleInstance";
     private Mutex? _mutex;
     private bool _ownsMutex;
     private IndicatorWindow? _window;

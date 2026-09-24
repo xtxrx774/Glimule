@@ -35,6 +35,16 @@ internal static class SettingsStore
     {
         try
         {
+            if (!File.Exists(Path))
+            {
+                var legacy = System.IO.Path.Combine(StartupService.LegacyInstallDir, "settings.json");
+                if (File.Exists(legacy))
+                {
+                    Directory.CreateDirectory(StartupService.InstallDir);
+                    File.Copy(legacy, Path, overwrite: false);
+                }
+            }
+
             if (File.Exists(Path))
             {
                 Current = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(Path)) ?? new AppSettings();

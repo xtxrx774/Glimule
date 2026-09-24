@@ -1,7 +1,7 @@
 <Window x:Class="CursorUI.IndicatorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CursorUI"
+        Title="Glimule"
         Width="220"
         Height="72"
         WindowStyle="None"
