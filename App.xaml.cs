@@ -18,9 +18,12 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(System.Windows.StartupEventArgs e)
     {
         var en = CultureInfo.GetCultureInfo("en-US");
+
         CultureInfo.DefaultThreadCurrentUICulture = en;
         Thread.CurrentThread.CurrentUICulture = en;
+
         base.OnStartup(e);
+
         _mutex = new Mutex(true, MutexName, out var created);
         if (!created)
         {
@@ -38,6 +41,7 @@ public partial class App : System.Windows.Application
 
         _overlay = new OverlayService(_window);
         _tray = new TrayService(OpenSettings, Shutdown);
+
         _overlay.Start();
         _tray.Show();
     }
@@ -66,7 +70,14 @@ public partial class App : System.Windows.Application
         _window?.Close();
         if (_ownsMutex)
         {
-            try { _mutex?.ReleaseMutex(); } catch { }
+            try
+            {
+                _mutex?.ReleaseMutex();
+            }
+            catch
+            {
+                // The mutex may already be gone during shutdown.
+            }
         }
         _mutex?.Dispose();
         base.OnExit(e);

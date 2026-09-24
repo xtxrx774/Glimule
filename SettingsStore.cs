@@ -7,6 +7,7 @@ namespace Glimule;
 internal sealed class AppSettings
 {
     public bool CapsuleInTextField { get; set; } = true;
+
     public bool RunAtStartup { get; set; } = true;
     public bool UseDefaultScale { get; set; } = true;
     public int BubbleScale { get; set; } = 100;
@@ -16,7 +17,11 @@ internal sealed class AppSettings
     {
         get
         {
-            if (UseDefaultScale) return 1;
+            if (UseDefaultScale)
+            {
+                return 1;
+            }
+
             return Math.Clamp(BubbleScale, 50, 200) / 100.0;
         }
     }
@@ -24,7 +29,11 @@ internal sealed class AppSettings
 
 internal static class SettingsStore
 {
-    private static readonly JsonSerializerOptions Json = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions Json = new()
+    {
+        WriteIndented = true
+    };
+
     private static readonly string Path = System.IO.Path.Combine(StartupService.InstallDir, "settings.json");
 
     public static AppSettings Current { get; private set; } = new();
@@ -38,6 +47,7 @@ internal static class SettingsStore
             if (!File.Exists(Path))
             {
                 var legacy = System.IO.Path.Combine(StartupService.LegacyInstallDir, "settings.json");
+
                 if (File.Exists(legacy))
                 {
                     Directory.CreateDirectory(StartupService.InstallDir);
@@ -47,7 +57,8 @@ internal static class SettingsStore
 
             if (File.Exists(Path))
             {
-                Current = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(Path)) ?? new AppSettings();
+                var contents = File.ReadAllText(Path);
+                Current = JsonSerializer.Deserialize<AppSettings>(contents) ?? new AppSettings();
             }
         }
         catch
@@ -56,7 +67,9 @@ internal static class SettingsStore
         }
 
         StartupService.SetEnabled(Current.RunAtStartup);
-        Current.BubbleScale = Math.Clamp(Current.BubbleScale == 0 ? 100 : Current.BubbleScale, 50, 200);
+
+        var scale = Current.BubbleScale == 0 ? 100 : Current.BubbleScale;
+        Current.BubbleScale = Math.Clamp(scale, 50, 200);
     }
 
     public static void Save()
@@ -64,11 +77,13 @@ internal static class SettingsStore
         try
         {
             Directory.CreateDirectory(StartupService.InstallDir);
-            File.WriteAllText(Path, JsonSerializer.Serialize(Current, Json));
+
+            var contents = JsonSerializer.Serialize(Current, Json);
+            File.WriteAllText(Path, contents);
         }
         catch
         {
-            // ignore disk errors
+            // Settings are optional; the next change will try again.
         }
 
         StartupService.SetEnabled(Current.RunAtStartup);
