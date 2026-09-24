@@ -21,9 +21,9 @@ The indicator follows the focused caret and adapts to the current monitor, makin
 
 ## Installation
 
-Download the latest build from [Releases](https://github.com/xtxrx774/Glimule/releases), extract it, and run `Glimule.exe`.
+Download `Glimule.exe` from [Releases](https://github.com/xtxrx774/Glimule/releases) and run it.
 
-Glimule requires Windows 10 or later and [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+Glimule requires Windows 10 or later (64-bit).
 
 ## Build
 
