@@ -306,7 +306,11 @@ public partial class IndicatorWindow : Window
         return Math.Max(22, w);
     }
 
-    private static double ItemWidth(string label) => label.Length > 1 ? 34 : 22;
+    private static double ItemWidth(string label)
+    {
+        if (string.IsNullOrEmpty(label) || label.Length == 1) return 22;
+        return label.Length == 2 ? 34 : 42;
+    }
 
     private double Scale => Math.Clamp(SettingsStore.Current.ScaleFactor, 0.5, 2.0);
 

@@ -17,8 +17,8 @@ internal sealed class TrayService : IDisposable
         };
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add("Настройки", null, (_, _) => openSettings());
-        menu.Items.Add("Выход", null, (_, _) => shutdown());
+        menu.Items.Add("Settings", null, (_, _) => openSettings());
+        menu.Items.Add("Exit", null, (_, _) => shutdown());
         _icon.ContextMenuStrip = menu;
         _icon.DoubleClick += (_, _) => openSettings();
     }

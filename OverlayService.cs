@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -80,8 +79,8 @@ internal sealed class OverlayService : IDisposable
         {
             if (_lastLang != 0)
             {
-                _previousLabel = LabelFor(_lastLang);
-                FlashLanguage(LabelFor(lang));
+                _previousLabel = LayoutLabel.FromLangId(_lastLang);
+                FlashLanguage(LayoutLabel.FromLangId(lang));
             }
 
             _lastLang = lang;
@@ -186,7 +185,7 @@ internal sealed class OverlayService : IDisposable
         var labels = new List<string>();
         foreach (var id in ids)
         {
-            var label = LabelFor(unchecked((ushort)id.ToInt64()));
+            var label = LayoutLabel.FromLangId(unchecked((ushort)id.ToInt64()));
             if (!labels.Contains(label)) labels.Add(label);
         }
 
@@ -213,40 +212,7 @@ internal sealed class OverlayService : IDisposable
         return unchecked((ushort)Native.GetKeyboardLayout(tid).ToInt64());
     }
 
-    private string CurrentLanguageLabel() => LabelFor(CurrentLanguageId());
-
-    private static string LabelFor(ushort langId)
-    {
-        if (langId == 0) return "A";
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(langId);
-            return culture.TwoLetterISOLanguageName.ToUpperInvariant() switch
-            {
-                "EN" => "A",
-                "RU" => "РУ",
-                "UK" => "УК",
-                "BE" => "БЕ",
-                "ZH" => "中",
-                "JA" => "あ",
-                "KO" => "한",
-                "AR" => "ع",
-                "HE" => "ע",
-                "DE" => "DE",
-                "FR" => "FR",
-                "ES" => "ES",
-                "IT" => "IT",
-                "PT" => "PT",
-                "PL" => "PL",
-                "TR" => "TR",
-                var other => other
-            };
-        }
-        catch
-        {
-            return langId == 0x0419 ? "РУ" : "A";
-        }
-    }
+    private string CurrentLanguageLabel() => LayoutLabel.FromLangId(CurrentLanguageId());
 
     private static System.Windows.Media.Color ReadAccent()
     {

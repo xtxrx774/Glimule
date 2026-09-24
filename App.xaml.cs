@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
@@ -16,6 +17,9 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(System.Windows.StartupEventArgs e)
     {
+        var en = CultureInfo.GetCultureInfo("en-US");
+        CultureInfo.DefaultThreadCurrentUICulture = en;
+        Thread.CurrentThread.CurrentUICulture = en;
         base.OnStartup(e);
         _mutex = new Mutex(true, MutexName, out var created);
         if (!created)
