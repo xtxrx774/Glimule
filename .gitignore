@@ -9,6 +9,8 @@ TestResults/
 *.log
 Settings.json
 make_preview.py
+record_sublime_preview.py
+_glimule_demo.py
 chk*.png
 f*.png
 Assets/_preview_*.png
