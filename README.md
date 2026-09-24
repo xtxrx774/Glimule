@@ -38,7 +38,3 @@ The executable is written to `bin\Release\net8.0-windows\Glimule.exe`.
 ## Usage
 
 Launch `Glimule.exe`. The application runs in the notification area. Open the tray menu to change the scale, configure startup, open settings, or exit.
-
-## По-русски
-
-Glimule — небольшая утилита в системном трее для Windows. Она показывает текущую раскладку клавиатуры и состояние Caps Lock рядом с текстовым курсором. Поддерживаются обычные поля ввода, браузеры, Word и Excel; масштаб индикатора можно настроить в пределах 50–200%.
