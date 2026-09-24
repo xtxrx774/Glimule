@@ -48,7 +48,6 @@ internal sealed class TrayService : IDisposable
         }
         catch
         {
-            // fall back
         }
 
         var exe = Environment.ProcessPath;
@@ -61,7 +60,6 @@ internal sealed class TrayService : IDisposable
             }
             catch
             {
-                // fall back
             }
         }
 

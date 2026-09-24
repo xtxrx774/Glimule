@@ -92,7 +92,7 @@
                 <StackPanel Margin="0,0,14,0">
                     <TextBlock Text="Capsule at the caret" FontSize="15" FontWeight="SemiBold"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#A1A1A6" FontSize="12.5" Margin="0,6,0,0"
-                               Text="When the caret is in a text field, the layout is shown next to it. Win+Space no longer opens the Windows language bar."/>
+                               Text="Show the bubble next to the caret. Also hides the Win+Space language bar."/>
                 </StackPanel>
                 <CheckBox x:Name="CapsuleToggle" Grid.Column="1" Style="{StaticResource Switch}"
                           VerticalAlignment="Top" Margin="0,2,0,0"
@@ -136,7 +136,7 @@
                 <StackPanel Margin="0,0,14,0">
                     <TextBlock Text="Start with Windows" FontSize="15" FontWeight="SemiBold"/>
                     <TextBlock TextWrapping="Wrap" Foreground="#A1A1A6" FontSize="12.5" Margin="0,6,0,0"
-                               Text="Open Glimule when you sign in."/>
+                               Text="Launch Glimule after sign-in."/>
                 </StackPanel>
                 <CheckBox x:Name="StartupToggle" Grid.Column="1" Style="{StaticResource Switch}"
                           VerticalAlignment="Top" Margin="0,2,0,0"

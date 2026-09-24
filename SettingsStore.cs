@@ -83,7 +83,6 @@ internal static class SettingsStore
         }
         catch
         {
-            // Settings are optional; the next change will try again.
         }
 
         StartupService.SetEnabled(Current.RunAtStartup);

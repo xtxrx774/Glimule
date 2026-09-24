@@ -18,9 +18,11 @@ internal static class LayoutLabel
         ["KY"] = "КЫ",
         ["TG"] = "ТЖ",
         ["TT"] = "ТТ",
+
         ["ZH"] = "中",
         ["JA"] = "あ",
         ["KO"] = "한",
+
         ["AR"] = "ع",
         ["HE"] = "ע",
         ["YI"] = "יי",
@@ -51,6 +53,7 @@ internal static class LayoutLabel
         ["EL"] = "ΕΛ",
         ["HY"] = "Հ",
         ["KA"] = "ქ",
+
         ["BO"] = "བོ",
         ["DZ"] = "རྫ",
         ["IU"] = "ᐃ",
@@ -59,18 +62,24 @@ internal static class LayoutLabel
 
     public static string FromLangId(ushort langId)
     {
-        if (langId == 0) return "?";
+        if (langId == 0)
+            return "?";
+
         try
         {
             var culture = CultureInfo.GetCultureInfo(langId);
             var iso = culture.TwoLetterISOLanguageName;
             if (string.IsNullOrEmpty(iso) || iso.Equals("iv", StringComparison.OrdinalIgnoreCase))
                 iso = culture.ThreeLetterISOLanguageName;
+
             if (string.IsNullOrEmpty(iso))
                 return langId.ToString("X");
 
             iso = iso.ToUpperInvariant();
-            return Native.TryGetValue(iso, out var mark) ? mark : iso;
+            if (Native.TryGetValue(iso, out var mark))
+                return mark;
+
+            return iso;
         }
         catch
         {

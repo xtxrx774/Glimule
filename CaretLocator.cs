@@ -280,7 +280,7 @@ internal static class CaretLocator
                 }
                 catch
                 {
-                    // some providers reject collapse
+                    // Chrome's range doesn't like this
                 }
 
                 if (TryRangeRect(end, out var selRect) && IsPlausibleScreen(selRect))
@@ -303,7 +303,6 @@ internal static class CaretLocator
             }
             catch
             {
-                // ignore
             }
 
             try
@@ -319,7 +318,7 @@ internal static class CaretLocator
             }
             catch
             {
-                // empty documents often have no character range
+                // empty richedit has no range
             }
 
             if (TryUiaBounds(element, hwnd, threadId, out caret)) return true;
@@ -703,7 +702,7 @@ internal static class CaretLocator
         }
         catch
         {
-            // some providers reject the property
+            // UIA can throw on this property
         }
 
         try
@@ -853,7 +852,7 @@ internal static class CaretLocator
         }
         catch
         {
-            // some combo providers reject ValuePattern
+            // ComboBox ValuePattern is flaky
         }
 
         try

@@ -13,7 +13,7 @@
     <RootNamespace>Glimule</RootNamespace>
     <Product>Glimule</Product>
     <AssemblyTitle>Glimule</AssemblyTitle>
-    <Description>Keyboard layout and Caps Lock indicator for Windows</Description>
+    <Description>Layout and Caps Lock HUD for Windows</Description>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\Glimule.ico" />

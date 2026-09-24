@@ -147,7 +147,6 @@ internal static class LanguageOverlay
             }
             catch
             {
-                // process may have exited
             }
         }
 

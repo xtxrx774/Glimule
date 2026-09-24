@@ -31,7 +31,6 @@ internal sealed class KeyboardHook : IDisposable
             }
             catch
             {
-                // never break the hook
             }
         }
 

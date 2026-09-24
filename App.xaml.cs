@@ -76,7 +76,6 @@ public partial class App : System.Windows.Application
             }
             catch
             {
-                // The mutex may already be gone during shutdown.
             }
         }
         _mutex?.Dispose();

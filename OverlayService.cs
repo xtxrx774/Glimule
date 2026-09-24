@@ -29,8 +29,13 @@ internal sealed class OverlayService : IDisposable
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
         _timer.Tick += (_, _) =>
         {
-            try { Tick(); }
-            catch { /* keep the overlay alive */ }
+            try
+            {
+                Tick();
+            }
+            catch
+            {
+            }
         };
         _keys.WinSpace += OnWinSpace;
         _keys.Typing += OnTyping;
@@ -231,7 +236,6 @@ internal sealed class OverlayService : IDisposable
         }
         catch
         {
-            // default accent
         }
 
         return System.Windows.Media.Color.FromRgb(0x00, 0x7A, 0xFF);
