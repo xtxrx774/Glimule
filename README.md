@@ -1,33 +1,44 @@
 # Glimule
 
-A tiny Windows tray HUD that shows **Caps Lock** and the **keyboard layout** next to the text caret.
+## Keyboard layout and Caps Lock indicator for Windows
 
 ![Glimule](preview.gif)
 
-When you type, a capsule appears at the insertion point: an outlined Caps Lock glyph while Caps is on, and a sliding **A | РУ** (or your other layouts) picker when you switch languages. The indicator follows the focused text field and stays out of the way otherwise.
+Glimule is a lightweight tray utility that displays the active keyboard layout and Caps Lock state beside the text caret. It provides a compact visual cue while you work in text fields without replacing the standard Windows input controls.
 
-Works in ordinary edit boxes, browsers, Word, and Excel. Built with WPF on .NET 8.
+The indicator follows the focused caret and adapts to the current monitor, making the active layout visible where it matters: next to the text you are editing.
 
 ## Features
 
-- Capsule overlay anchored to the caret, not the screen corner
-- Caps Lock shown only when you stop typing
-- Language-switch animation with a sliding selection pill
-- Optional hide of the stock Windows language overlay while a text field is focused
-- Live scale (50–200%) from the tray, no restart
-- Run at startup, from the tray menu
+- Shows the current keyboard layout next to the caret
+- Displays the Caps Lock state with a dedicated indicator
+- Smooth animated transitions when switching layouts
+- Supports text fields in desktop applications, browsers, Word, and Excel
+- Per-monitor DPI support
+- Adjustable indicator scale from 50% to 200%
+- Optional Windows startup launch
+- Runs quietly from the notification area
 
-## Run
+## Installation
 
-Requires Windows 10/11 and [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0).
+Download the latest build from [Releases](https://github.com/xtxrx774/Glimule/releases), extract it, and run `CursorUI.exe`.
+
+Glimule requires Windows 10 or later and [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+
+## Build
+
+The project uses WPF and WinForms on .NET 8:
 
 ```powershell
 dotnet build -c Release
-Start-Process .\bin\Release\net8.0-windows\CursorUI.exe
 ```
 
-Quit from the tray icon (**Выход**). Settings are under **Настройки**.
+The executable is written to `bin\Release\net8.0-windows\CursorUI.exe`.
+
+## Usage
+
+Launch `CursorUI.exe`. The application runs in the notification area. Open the tray menu to change the scale, configure startup, open settings, or exit.
 
 ## По-русски
 
-Утилита в трее: капсула у текстового курсора показывает Caps Lock и текущую раскладку (A / РУ и другие). Появляется только в полях ввода. Выход и настройки — в меню иконки в трее.
+Glimule — небольшая утилита в системном трее для Windows. Она показывает текущую раскладку клавиатуры и состояние Caps Lock рядом с текстовым курсором. Поддерживаются обычные поля ввода, браузеры, Word и Excel; масштаб индикатора можно настроить в пределах 50–200%.
