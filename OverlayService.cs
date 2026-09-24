@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal sealed class OverlayService : IDisposable
 {
@@ -91,7 +91,7 @@ internal sealed class OverlayService : IDisposable
         LanguageOverlay.SetAltShiftHidden(smart && _inTextField);
         if (LanguageOverlay.IsHidingPopups || (smart && _inTextField && DateTime.UtcNow < _languageUntil))
         {
-            LanguageOverlay.HideFlyouts();
+            LanguageOverlay.HidePopups();
         }
 
         if (!smart)
@@ -265,7 +265,7 @@ internal sealed class OverlayService : IDisposable
         }
         catch
         {
-            // fall back to macOS default blue
+            // default accent
         }
 
         return System.Windows.Media.Color.FromRgb(0x00, 0x7A, 0xFF);
@@ -276,6 +276,6 @@ internal sealed class OverlayService : IDisposable
         _timer.Stop();
         _keys.Dispose();
         LanguageOverlay.Restore();
-        _window.HideOverlay();
+        _window.HideNow();
     }
 }

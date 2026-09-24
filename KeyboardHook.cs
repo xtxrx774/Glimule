@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal sealed class KeyboardHook : IDisposable
 {

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal static class Native
 {
@@ -11,7 +11,6 @@ internal static class Native
     public const int WsExLayered = 0x00080000;
 
     public const uint ObjIdCaret = 0xFFFFFFF8;
-    public const uint ObjIdClient = 0xFFFFFFFC;
     public const int ChildIdSelf = 0;
     public const int VkCapital = 0x14;
     public const int VkEscape = 0x1B;
@@ -22,8 +21,6 @@ internal static class Native
     public const int WmKeyDown = 0x0100;
     public const int WmSysKeyDown = 0x0104;
     public const uint GuiCaretBlinking = 0x00000001;
-    public const int CursorShowing = 0x00000001;
-    public const int IdcIbeam = 32513;
     public const uint MonitorDefaultToNearest = 2;
     public const int MdtEffectiveDpi = 0;
 
@@ -57,15 +54,6 @@ internal static class Native
         public Rect rcCaret;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct CursorInfo
-    {
-        public int cbSize;
-        public int flags;
-        public IntPtr hCursor;
-        public Point ptScreenPos;
-    }
-
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
 
@@ -77,9 +65,6 @@ internal static class Native
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetFocus();
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern IntPtr FindWindowEx(IntPtr parent, IntPtr childAfter, string? className, string? windowTitle);
 
     [DllImport("imm32.dll")]
     public static extern IntPtr ImmGetContext(IntPtr hwnd);
@@ -152,15 +137,6 @@ internal static class Native
     public static extern int MapWindowPoints(IntPtr hWndFrom, IntPtr hWndTo, ref Rect lpPoints, int cPoints);
 
     [DllImport("user32.dll")]
-    public static extern uint GetDpiForWindow(IntPtr hwnd);
-
-    [DllImport("user32.dll")]
-    public static extern bool GetCursorInfo(ref CursorInfo pci);
-
-    [DllImport("user32.dll")]
-    public static extern IntPtr LoadCursor(IntPtr hInstance, IntPtr lpCursorName);
-
-    [DllImport("user32.dll")]
     public static extern IntPtr MonitorFromPoint(Point pt, uint dwFlags);
 
     [DllImport("Shcore.dll")]
@@ -199,6 +175,11 @@ internal static class Native
     public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
     public const int SwHide = 0;
+    public const uint SwpNoActivate = 0x0010;
+    public const uint SwpNoMove = 0x0002;
+    public const uint SwpNoSize = 0x0001;
+    public static readonly IntPtr HwndTop = IntPtr.Zero;
+    public static readonly IntPtr HwndNoTopmost = new(-2);
 
     public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
@@ -220,39 +201,11 @@ internal static class Native
     [DllImport("user32.dll")]
     public static extern bool IsWindow(IntPtr hWnd);
 
-    public const int GwlpHwndParent = -8;
-    public const uint SwpNoActivate = 0x0010;
-    public const uint SwpNoMove = 0x0002;
-    public const uint SwpNoSize = 0x0001;
-    public static readonly IntPtr HwndTop = IntPtr.Zero;
-    public static readonly IntPtr HwndNoTopmost = new(-2);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
-    private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongW")]
-    private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
-
-    public static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong) =>
-        IntPtr.Size == 8
-            ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
-            : new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
-
     [DllImport("user32.dll")]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
     [DllImport("user32.dll")]
     public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
-
-    public static string WindowTitle(IntPtr hwnd)
-    {
-        var sb = new System.Text.StringBuilder(256);
-        _ = GetWindowText(hwnd, sb, sb.Capacity);
-        return sb.ToString();
-    }
 
     [DllImport("dwmapi.dll")]
     public static extern int DwmGetColorizationColor(out uint pcrColorization, out bool pfOpaqueBlend);

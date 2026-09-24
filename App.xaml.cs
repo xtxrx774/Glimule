@@ -2,7 +2,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace CursorUI;
+namespace Glimule;
 
 public partial class App : System.Windows.Application
 {
@@ -30,7 +30,7 @@ public partial class App : System.Windows.Application
         _window = new IndicatorWindow();
         _ = new WindowInteropHelper(_window).EnsureHandle();
         _window.Show();
-        _window.HideOverlay();
+        _window.HideNow();
 
         _overlay = new OverlayService(_window);
         _tray = new TrayService(OpenSettings, Shutdown);

@@ -4,7 +4,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace CursorUI;
+namespace Glimule;
 
 public partial class IndicatorWindow : Window
 {
@@ -126,14 +126,6 @@ public partial class IndicatorWindow : Window
         AnimateSelection(targetLeft, targetWidth);
     }
 
-    internal void Dismiss()
-    {
-        if (!_shown) return;
-        _shown = false;
-        _caps = false;
-        PopOut();
-    }
-
     internal void HideNow()
     {
         _shown = false;
@@ -146,8 +138,6 @@ public partial class IndicatorWindow : Window
         Visibility = Visibility.Hidden;
         AttachTo(IntPtr.Zero);
     }
-
-    public void HideOverlay() => HideNow();
 
     private void AttachTo(IntPtr owner)
     {

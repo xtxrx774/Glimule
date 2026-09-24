@@ -2,7 +2,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal sealed class AppSettings
 {

@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace CursorUI;
+namespace Glimule;
 
 public partial class SettingsWindow : Window
 {

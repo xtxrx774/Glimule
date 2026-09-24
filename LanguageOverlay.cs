@@ -1,6 +1,6 @@
 using Microsoft.Win32;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal static class LanguageOverlay
 {
@@ -39,7 +39,11 @@ internal static class LanguageOverlay
         HidePopups();
     }
 
-    public static void HideFlyouts() => HidePopups();
+    public static void HidePopups()
+    {
+        _enum ??= OnWindow;
+        Native.EnumWindows(_enum, IntPtr.Zero);
+    }
 
     private static void ApplyDelay(bool hide)
     {
@@ -105,12 +109,6 @@ internal static class LanguageOverlay
     {
         if (saved == null) key.DeleteValue(name, false);
         else key.SetValue(name, saved);
-    }
-
-    private static void HidePopups()
-    {
-        _enum ??= OnWindow;
-        Native.EnumWindows(_enum, IntPtr.Zero);
     }
 
     private static bool OnWindow(IntPtr hwnd, IntPtr lParam)

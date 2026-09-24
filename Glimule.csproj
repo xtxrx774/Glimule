@@ -7,14 +7,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>Assets\Glimule.ico</ApplicationIcon>
     <AssemblyName>Glimule</AssemblyName>
-    <RootNamespace>CursorUI</RootNamespace>
+    <RootNamespace>Glimule</RootNamespace>
     <Product>Glimule</Product>
     <AssemblyTitle>Glimule</AssemblyTitle>
     <Description>Keyboard layout and Caps Lock indicator for Windows</Description>
   </PropertyGroup>
-    <ItemGroup>
+  <ItemGroup>
     <Resource Include="Assets\Glimule.ico" />
   </ItemGroup>
   <ItemGroup>

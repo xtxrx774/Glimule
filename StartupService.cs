@@ -1,7 +1,7 @@
 using Microsoft.Win32;
 using System.IO;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal static class StartupService
 {

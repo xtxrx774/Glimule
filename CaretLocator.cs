@@ -1,7 +1,7 @@
 using System.Windows.Automation;
 using System.Windows.Automation.Text;
 
-namespace CursorUI;
+namespace Glimule;
 
 internal readonly record struct CaretInfo(
     double X,
@@ -18,7 +18,6 @@ internal readonly record struct CaretInfo(
 internal static class CaretLocator
 {
     private static readonly Guid IidAccessible = new("618736E0-3C3D-11CF-810C-00AA00389B71");
-    private static IntPtr _lastApp;
     private static CaretInfo _cached;
     private static DateTime _cacheAt;
 
@@ -33,7 +32,6 @@ internal static class CaretLocator
         if (root == IntPtr.Zero) root = hwnd;
         if (!Native.IsWindow(root) || Native.IsIconic(root) || !Native.IsWindowVisible(root))
         {
-            _lastApp = IntPtr.Zero;
             _cached = default;
             return default;
         }
@@ -636,16 +634,6 @@ internal static class CaretLocator
         return false;
     }
 
-    private static bool IsBrowserClass(string cls)
-    {
-        if (cls.Contains("Chrome_RenderWidget", StringComparison.OrdinalIgnoreCase)) return true;
-        if (cls.StartsWith("Chrome_WidgetWin", StringComparison.OrdinalIgnoreCase)) return true;
-        if (cls.Contains("Mozilla", StringComparison.OrdinalIgnoreCase)) return true;
-        if (cls.Equals("Internet Explorer_Server", StringComparison.OrdinalIgnoreCase)) return true;
-        if (cls.Contains("CefBrowser", StringComparison.OrdinalIgnoreCase)) return true;
-        return false;
-    }
-
     private static bool IsDedicatedEditorClass(string cls)
     {
         if (string.IsNullOrEmpty(cls)) return false;
@@ -929,26 +917,16 @@ internal static class CaretLocator
     {
         var hwnd = Native.GetForegroundWindow();
         if (hwnd == IntPtr.Zero || hwnd == Native.GetDesktopWindow() || hwnd == Native.GetShellWindow())
-        {
-            _lastApp = IntPtr.Zero;
             return IntPtr.Zero;
-        }
 
         if (Native.IsOurWindow(hwnd))
-        {
-            _lastApp = IntPtr.Zero;
             return IntPtr.Zero;
-        }
 
         var root = Native.GetAncestor(hwnd, Native.GaRoot);
         if (root == IntPtr.Zero) root = hwnd;
         if (Native.IsIconic(root) || !Native.IsWindowVisible(root))
-        {
-            _lastApp = IntPtr.Zero;
             return IntPtr.Zero;
-        }
 
-        _lastApp = hwnd;
         return hwnd;
     }
 
