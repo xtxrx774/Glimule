@@ -16,7 +16,7 @@ Glimule is designed as a Windows implementation of the input HUD familiar from m
 - the active keyboard layout uses the same concise visual language, such as **A** and **РУ**;
 - layout changes use a sliding selection accent and a short pop-in animation;
 - the Caps Lock indicator uses a separate blue accent and appears without interrupting typing;
-- the overlay is shown only while editing text, instead of being fixed to a screen corner;
+- the overlay is shown only while editing text;
 - the dark translucent surface, generous corner radius, centered glyphs, and restrained animation follow the same visual principles as the macOS interface.
 
 This is an independent Windows utility inspired by that interaction pattern. It does not include Apple code or replace Windows' native input system.
